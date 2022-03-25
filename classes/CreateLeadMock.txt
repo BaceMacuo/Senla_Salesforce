@@ -1,0 +1,42 @@
+public class CreateLeadMock {
+    public static void createLead(){
+        List<Lead> leads = new List<Lead>();
+        for(Integer i = 0; i <= 15; i++){
+            if(i<=5){
+                Lead l = new Lead(
+                    LastName = 'Tesat_2_' + i,
+                    Email = 'bookao_o@mail.ru',
+                    Phone = '+37533633757' + i,
+                    Company = 'Test Company_2_' + i,
+                    Status = 'Open (default)Negotiations',
+                    Authority__c = 'Access to Buyer Confirmed',
+                    Budget__c = 'Budget Confirmed, Amount Unknown',
+                    Need__c = 'Intermediate Need');
+                leads.add(l); 
+            } else if(i>5 && i<=10){
+                Lead l = new Lead(
+                    LastName = 'Tesat_2_' + i,
+                    Email = 'bookao_o@mail.ru',
+                    Phone = '+37533633757' + i,
+                    Company = 'Test Company_2_' + i,
+                    Status = 'Open (default)Negotiations',
+                    Authority__c = 'Access to Buyer Confirmed',
+                    Budget__c = 'Budget Confirmed, Amount Known',
+                    Need__c = 'Intermediate Need');
+                leads.add(l); 
+            } else if(i>10 && i<=15){
+                Lead l = new Lead(
+                    LastName = 'Tesat_2_' + i,
+                    Email = 'bookao_o@mail.ru',
+                    Phone = '+3753363375' + i,
+                    Company = 'Test Company_2_' + i,
+                    Status = 'Open (default)Negotiations',
+                    Authority__c = 'Access to Buyer Confirmed',
+                    Budget__c = 'Budget Confirmed, Amount Known',
+                    Need__c = 'Urgent Need');
+                leads.add(l);
+            }   
+        }
+        insert leads;
+    }
+}
