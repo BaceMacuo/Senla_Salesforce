@@ -1,0 +1,11 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId" access="global"  controller = "AuraControlCaseDuple" >
+    
+    <aura:attribute name="data" type="Map"/>
+    <aura:attribute name="columns" type="List"/>
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <lightning:datatable keyField="id" 
+                         data="{! v.data }" 
+                         columns="{! v.columns }"/>
+</aura:component>
