@@ -1,0 +1,50 @@
+public class BatchServerAddLeadToQueues {
+    
+    public void accession(List <Lead> leadList){
+        
+        Map<Id, Integer> sizeLeadInQueue = new Map<Id, Integer>();
+        LIst<Id> idQueueListForLead = new List<Id>();
+        
+        String status = 'Open (default)Negotiations';
+        Id idQueueForLead;
+        Lead led = leadList[0];
+        Integer valueMapList = 0;        
+        
+        List<QueueSobject> queueList = [SELECT Id, QueueId FROM QueueSobject WHERE SobjectType = 'Lead'];
+        for(QueueSobject qs: queueList){
+            idQueueForLead = qs.QueueId;
+            idQueueListForLead.add(idQueueForLead);
+        }
+        
+        List<Lead> allLead = [SELECT Id, Total_Score__c, OwnerId From Lead WHERE Status =: status AND Total_Score__c > 3 AND OwnerId =: idQueueListForLead];        
+        
+        for(Lead l: leadList){         
+            if(l.Total_Score__c > led.Total_Score__c){
+                led = l;
+            }
+        }
+        
+        for(Id i: idQueueListForLead){
+            for(Lead l: allLead){
+                if(l.OwnerId == i){
+                    valueMapList = valueMapList + 1;
+                }
+            }
+            sizeLeadInQueue.put(i, valueMapList);
+            valueMapList = 0;
+        }
+        
+      	Id idMinSizeQueue = idQueueListForLead[0];
+        Integer size = sizeLeadInQueue.get(idQueueListForLead[0]);
+        
+        for(Integer i = 1; i < sizeLeadInQueue.size(); i++){
+            if(size > sizeLeadInQueue.get(idQueueListForLead[i])){
+                idMinSizeQueue = idQueueListForLead[i];
+                size = sizeLeadInQueue.get(idQueueListForLead[i]);
+            }               
+        }
+        
+        led.OwnerId = idMinSizeQueue;   
+        update led;
+    }
+}

@@ -1,0 +1,35 @@
+global class BatchAddLeadToQueues implements Database.Batchable<sObject>{
+    public BatchServerAddLeadToQueues handler = new BatchServerAddLeadToQueues();
+    public Integer recordProcessed = 0;
+    
+    global Database.querylocator start(Database.BatchableContext BC){
+        String query;
+        String status = 'Open (default)Negotiations';
+        Id idSysAdmin = '0055j000006Ay2hAAC';
+        query = 'SELECT Total_Score__c,Id,Status,Name From Lead WHERE Status =:status AND Total_Score__c > 3 AND OwnerId =: idSysAdmin';
+        
+        return Database.getquerylocator(query);
+    }
+    
+    global void execute(Database.BatchableContext BC, List<Lead> leadList){
+        try{
+            handler.accession(leadList);
+            recordProcessed = recordProcessed + 1;
+            System.debug('Success!');
+        }
+        catch(Exception e){
+            System.debug('False in set List to Lead!' + e);
+        }
+    }
+    
+    global void finish(Database.BatchableContext BC){        
+        AsyncApexJob job = [SELECT Id, Status, NumberOfErrors,
+                            JobItemsProcessed,
+                            TotalJobItems, CreatedBy.Email
+                            FROM AsyncApexJob
+                            WHERE Id = :bc.getJobId()];
+        
+        System.debug(recordProcessed + 'records processed.' + job.Status);
+    }
+    
+}
