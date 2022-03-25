@@ -1,0 +1,9 @@
+trigger TrigEditSolutionResults on Case_Solution__c (after update) {
+    
+    TriggerHandlerEditSolRes trigHand = new TriggerHandlerEditSolRes();
+    
+    if(Trigger.isUpdate && Trigger.isAfter){
+        trigHand.afterUpdateMethod(TRigger.new);
+    }
+    
+}
