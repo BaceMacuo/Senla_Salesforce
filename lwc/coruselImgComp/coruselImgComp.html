@@ -1,0 +1,14 @@
+<template>
+    <template if:true={attachImg}>
+        <lightning-carousel>
+            <template for:each={attachImg} for:item="img">            
+                <lightning-carousel-image
+                    key={img}
+                    src={img}
+                    header="Attachments this Case"
+                >
+                </lightning-carousel-image>
+        </template>
+        </lightning-carousel>
+    </template>
+</template>
