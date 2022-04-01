@@ -1,0 +1,41 @@
+public class CaseSolutionTriggerHandler {    
+    
+    public void afterUpdateMethod(List<Case_Solution__c> caseSolNew){
+        afterUpdateSolutionResultsMethod(caseSolNew);
+    }
+    
+    public void afterUpdateSolutionResultsMethod(List<Case_Solution__c> caseSolNew){        
+        List<Id> caseClosedId = new List<Id>();
+        List<Id> caseSolutClosedId = new List<Id>();
+        List<Case_Solution__c> caseSolutCancelledList = new List<Case_Solution__c>();
+        Boolean searchId; // caseSolutClosedId.contains();
+        
+        for(Case_Solution__c caseSolUpdate : caseSolNew){
+            if(caseSolUpdate.Solution_Results__c == 'Resolved in advance' || caseSolUpdate.Solution_Results__c == 'Resolved via call'){
+                caseClosedId.add(caseSolUpdate.Case__c);
+                caseSolutClosedId.add(caseSolUpdate.Id);
+            }
+        }
+        
+        List<Case> caseClosedList = [SELECT ID, Status, 
+                                     (SELECT ID, Solution_Results__c FROM Cases_Solution1__r) 
+                                     FROM Case 
+                                     WHERE ID =: caseClosedId];
+        
+        for(Case caseClosed :caseClosedList){
+            caseClosed.Status = 'Closed';
+            
+            for(Case_Solution__c caseSolCancelled : caseClosed.Cases_Solution1__r){
+                searchId = caseSolutClosedId.contains(caseSolCancelled.Id);
+                
+                if(!searchId){
+                    caseSolCancelled.Solution_Results__c = 'Cancelled';
+                    caseSolutCancelledList.add(caseSolCancelled);
+                }                
+            }
+        }
+        
+        update caseClosedList;
+        update caseSolutCancelledList;
+    }
+}

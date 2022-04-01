@@ -1,0 +1,9 @@
+trigger CaseSolutionTrigger on Case_Solution__c (after update) {
+    
+    CaseSolutionTriggerHandler trigHand = new CaseSolutionTriggerHandler();
+    
+    if(Trigger.isUpdate && Trigger.isAfter){
+        trigHand.afterUpdateMethod(TRigger.new);
+    }
+    
+}
