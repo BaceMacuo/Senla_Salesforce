@@ -1,0 +1,21 @@
+global class AddLeadToQueuesBatch implements Database.Batchable<sObject>{
+    public AddLeadToQueuesBatchService service = new AddLeadToQueuesBatchService();
+    
+    global Database.querylocator start(Database.BatchableContext BC){
+        String query;
+        String status = Lead_Status__c.getValues('Status').Castom_Status__c;
+        String sysAdmin = 'System Administrator';
+        query = 'SELECT Total_Score__c, Id, Status, Name FROM Lead WHERE Status =:status AND Total_Score__c > 3 AND OwnerId IN (SELECT Id FROM User WHERE Profile.Name =: sysAdmin) ORDER BY Total_Score__c DESC';
+        
+        return Database.getquerylocator(query);
+    }
+    
+    global void execute(Database.BatchableContext BC, List<Lead> leadList){
+        if(leadList.size() != 0){
+            service.updateOwnierIdInLead(leadList);
+        }        
+    }
+    
+    global void finish(Database.BatchableContext BC){
+    }    
+}

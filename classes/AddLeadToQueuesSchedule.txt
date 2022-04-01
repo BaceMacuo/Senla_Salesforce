@@ -1,0 +1,9 @@
+global class AddLeadToQueuesSchedule implements Schedulable {
+   global void execute(SchedulableContext sc) {
+      AddLeadToQueuesBatch addLeadQueue = new AddLeadToQueuesBatch(); 
+      Id batchId = Database.executeBatch(addLeadQueue);
+   }
+    //AddLeadToQueuesBatch schedul = new AddLeadToQueuesBatch();
+	//String CRON_EXP = '0 0 * * * ?';
+	//String jobID = system.schedule('Hourly Job', CRON_EXP, schedul);
+}

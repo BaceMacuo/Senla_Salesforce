@@ -1,0 +1,67 @@
+public class AddLeadToQueuesBatchService {
+    
+    public void updateOwnierIdInLead(List <Lead> leadList){
+        updateOwner(leadList);
+    }    
+    
+    public void updateOwner(List <Lead> leadList){
+        
+        Map<Id, Integer> sizeLeadInQueue = new Map<Id, Integer>();
+        Map<Id, Integer> constMapForSort = new Map<Id, Integer>();
+        List<Id> idQueueListForLead = new List<Id>();
+        List<Integer> keyMapList = new List<Integer>();
+        List<Lead> leadsWithUpdateOwner = new List<Lead>();
+        
+        Integer valueSizeLeadInQueueMap = 0;
+        Id keySizeLeadInQueueMap;
+        
+        List<QueueSobject> queueList = [SELECT Id, QueueId FROM QueueSobject WHERE SobjectType = 'Lead'];
+        for(QueueSobject queueSobj: queueList){
+            idQueueListForLead.add(queueSobj.QueueId);
+        }
+        
+        List<Lead> allLead = [SELECT Id, OwnerId From Lead WHERE  OwnerId =: idQueueListForLead];
+        
+        for(Lead sysAdminLead: leadList){            
+            for(Id idQueue: idQueueListForLead){                
+                for(Lead leadWithQueue: allLead){                    
+                    if(leadWithQueue.OwnerId == idQueue){
+                        valueSizeLeadInQueueMap++;
+                    }
+                }                
+                if(constMapForSort.size() == 0){
+                    sizeLeadInQueue.put(idQueue, valueSizeLeadInQueueMap);                    
+                    valueSizeLeadInQueueMap = 0;                    
+                } else if(constMapForSort.size() != 0){                    
+                    for(Id keyConstMapForSort :constMapForSort.keySet()){                        
+                        if(idQueue == keyConstMapForSort){
+                            valueSizeLeadInQueueMap = constMapForSort.get(keyConstMapForSort);
+                        }
+                    }
+                    sizeLeadInQueue.put(idQueue, valueSizeLeadInQueueMap);
+                    valueSizeLeadInQueueMap = 0;
+                }
+            }
+            
+            keyMapList.addAll(sizeLeadInQueue.values());
+            keyMapList.sort();
+            
+            for(Id idQueue: sizeLeadInQueue.keySet()){
+                if(keyMapList[0] == sizeLeadInQueue.get(idQueue)){
+                    keySizeLeadInQueueMap = idQueue;
+                }
+            }
+            
+            sysAdminLead.OwnerId = keySizeLeadInQueueMap;
+            leadsWithUpdateOwner.add(sysAdminLead);
+            
+            constMapForSort.put(keySizeLeadInQueueMap, sizeLeadInQueue.get(keySizeLeadInQueueMap) + 1);
+            
+            sizeLeadInQueue.clear();
+            keyMapList.clear();
+            keySizeLeadInQueueMap = null;
+        }
+        
+        update leadsWithUpdateOwner;
+    }
+}
